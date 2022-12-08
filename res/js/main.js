@@ -1,36 +1,48 @@
 let bird;
-let pipes = [];
+let pipesBottom = [];
+let pipesTop = [];
+let x, y;
+let random = 0;
 
-function startGame() {
+const startGame = () => {
   myGameArea.start();
-  bird = new component(40, 40, "yellow", 600, 120);
-}
+  bird = new component(50, 50, "yellow", 600, 120);
+};
 
-var myGameArea = {
+let myGameArea = {
   canvas: document.getElementById("canvas"),
   start: function () {
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     this.frameNo = 0;
+    this.gravity = 0.05;
+    this.gravitySpeed = 0;
     this.interval = setInterval(() => {
-      for (i = 0; i < pipes.length; i += 1) {
-        if (bird.crashWith(pipes[i])) {
+      for (i = 0; i < pipesBottom.length; i += 1) {
+        if (bird.crashWith(pipesBottom[i]) || bird.crashWith(pipesTop[i])) {
           myGameArea.stop();
           return;
         }
       }
       myGameArea.clear();
       myGameArea.frameNo += 1;
-      if (myGameArea.frameNo == 1 || everyinterval(360)) {
+      if (myGameArea.frameNo == 1 || everyinterval(270)) {
         x = myGameArea.canvas.width;
         y = myGameArea.canvas.height - 200;
-        pipes.push(new component(80, 1000, "green", 1900, 400));
+        random = Math.random() * 600 - 300;
+        pipesBottom.push(new component(80, 10000, "green", 1900, 600 - random));
+        pipesTop.push(new component(80, 10000, "green", 1900, -9700 - random));
       }
-      for (i = 0; i < pipes.length; i += 1) {
-        pipes[i].x += -1;
-        pipes[i].update();
+      for (i = 0; i < pipesBottom.length; i += 1) {
+        pipesBottom[i].x += -1.5;
+        pipesBottom[i].update();
+        pipesTop[i].x += -1.5;
+        pipesTop[i].update();
       }
-      bird.y += 1;
+      if (this.gravitySpeed < 10) {
+        this.gravitySpeed += this.gravity;
+      }
+      bird.y += this.gravitySpeed;
       bird.update();
     }, 4);
     myGameArea.canvas.addEventListener("click", clickEvent);
@@ -45,7 +57,9 @@ var myGameArea = {
 };
 
 function everyinterval(n) {
-  if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+  if ((myGameArea.frameNo / n) % 1 == 0) {
+    return true;
+  }
   return false;
 }
 
@@ -60,15 +74,15 @@ function component(width, height, color, x, y) {
     ctx.fillRect(this.x, this.y, this.width, this.height);
   };
   this.crashWith = function (otherobj) {
-    var myleft = this.x;
-    var myright = this.x + this.width;
-    var mytop = this.y;
-    var mybottom = this.y + this.height;
-    var otherleft = otherobj.x;
-    var otherright = otherobj.x + otherobj.width;
-    var othertop = otherobj.y;
-    var otherbottom = otherobj.y + otherobj.height;
-    var crash = true;
+    let myleft = this.x;
+    let myright = this.x + this.width;
+    let mytop = this.y;
+    let mybottom = this.y + this.height;
+    let otherleft = otherobj.x;
+    let otherright = otherobj.x + otherobj.width;
+    let othertop = otherobj.y;
+    let otherbottom = otherobj.y + otherobj.height;
+    let crash = true;
     if (
       mybottom < othertop ||
       mytop > otherbottom ||
@@ -83,9 +97,10 @@ function component(width, height, color, x, y) {
 
 const clickEvent = () => {
   myGameArea.clear();
-  bird.y -= 120;
+  myGameArea.gravitySpeed = -4;
   bird.update();
-  for (i = 0; i < pipes.length; i += 1) {
-    pipes[i].update();
+  for (i = 0; i < pipesBottom.length; i += 1) {
+    pipesBottom[i].update();
+    pipesTop[i].update();
   }
 };
