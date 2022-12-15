@@ -8,7 +8,7 @@ let random = 0;
 
 const startGame = () => {
   bird = new component(50, 50, "yellow", 600, 120, "bird");
-  hint = new component("30px", "Consolas", "black", 280, 40, "text");
+  hint = new component("50px", "Consolas", "black", 600, 120, "text");
   hint.text = "Click to play";
   hint.update();
   pipesBottom = [];
@@ -76,7 +76,8 @@ function everyinterval(n) {
   return false;
 }
 
-function component(width, height, color, x, y, text) {
+function component(width, height, color, x, y, type) {
+  this.type = type;
   this.width = width;
   this.height = height;
   this.x = x;
