@@ -1,16 +1,28 @@
+const canvas = document.getElementById("canvas");
 let bird;
+let hint;
 let pipesBottom = [];
 let pipesTop = [];
 let x, y;
 let random = 0;
 
 const startGame = () => {
+  bird = new component(50, 50, "yellow", 600, 120, "bird");
+  hint = new component("30px", "Consolas", "black", 280, 40, "text");
+  hint.text = "Click to play";
+  hint.update();
+  pipesBottom = [];
+  pipesTop = [];
+  canvas.addEventListener("click", play);
+};
+
+const play = () => {
   myGameArea.start();
-  bird = new component(50, 50, "yellow", 600, 120);
+  canvas.removeEventListener("click", play);
 };
 
 let myGameArea = {
-  canvas: document.getElementById("canvas"),
+  canvas: canvas,
   start: function () {
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -30,8 +42,8 @@ let myGameArea = {
         x = myGameArea.canvas.width;
         y = myGameArea.canvas.height - 200;
         random = Math.random() * 600 - 300;
-        pipesBottom.push(new component(80, 10000, "green", 1900, 600 - random));
-        pipesTop.push(new component(80, 10000, "green", 1900, -9700 - random));
+        pipesBottom.push(new component(80, 10000, "green", 1900, 600 - random, "pipe"));
+        pipesTop.push(new component(80, 10000, "green", 1900, -9700 - random, "pipe"));
       }
       for (i = 0; i < pipesBottom.length; i += 1) {
         pipesBottom[i].x += -1.5;
@@ -53,6 +65,7 @@ let myGameArea = {
   stop: function () {
     clearInterval(this.interval);
     myGameArea.canvas.removeEventListener("click", clickEvent);
+    startGame();
   },
 };
 
@@ -63,15 +76,21 @@ function everyinterval(n) {
   return false;
 }
 
-function component(width, height, color, x, y) {
+function component(width, height, color, x, y, text) {
   this.width = width;
   this.height = height;
   this.x = x;
   this.y = y;
   this.update = () => {
-    ctx = myGameArea.context;
-    ctx.fillStyle = color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx = canvas.getContext("2d");
+    if (this.type == "text") {
+      ctx.font = this.width + " " + this.height;
+      ctx.fillStyle = color;
+      ctx.fillText(this.text, this.x, this.y);
+    } else {
+      ctx.fillStyle = color;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
   };
   this.crashWith = function (otherobj) {
     let myleft = this.x;
