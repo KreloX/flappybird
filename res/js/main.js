@@ -1,15 +1,26 @@
 const canvas = document.getElementById("canvas");
 let bird;
-let hint;
+let hint = new component("50px", "TentoFont", "black", 505, 280, "text");
+let score = new component("50px", "TentoFont", "black", 560, 120, "text");
+let hiScore = new component("50px", "TentoFont", "black", 500, 200, "text");
+let hiScoreNum = 0;
+let scoreNum = 0;
 let pipesBottom = [];
 let pipesTop = [];
-let x, y;
 let random = 0;
+let timeout;
 
 const startGame = () => {
-  bird = new component(50, 50, "yellow", 600, 120, "bird");
-  hint = new component("50px", "Consolas", "black", 600, 120, "text");
+  bird = new component(50, 50, "yellow", 600, 300, "bird");
   hint.text = "Click to play";
+  if (scoreNum > hiScoreNum) {
+    hiScoreNum = scoreNum;
+  }
+  score.text = `Score: ${scoreNum}`;
+  score.update();
+  scoreNum = 0;
+  hiScore.text = `High Score: ${hiScoreNum}`;
+  hiScore.update();
   hint.update();
   pipesBottom = [];
   pipesTop = [];
@@ -27,7 +38,7 @@ let myGameArea = {
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     this.frameNo = 0;
-    this.gravity = 0.05;
+    this.gravity = 0.06;
     this.gravitySpeed = 0;
     this.interval = setInterval(() => {
       for (i = 0; i < pipesBottom.length; i += 1) {
@@ -38,12 +49,17 @@ let myGameArea = {
       }
       myGameArea.clear();
       myGameArea.frameNo += 1;
-      if (myGameArea.frameNo == 1 || everyinterval(270)) {
-        x = myGameArea.canvas.width;
-        y = myGameArea.canvas.height - 200;
-        random = Math.random() * 600 - 300;
-        pipesBottom.push(new component(80, 10000, "green", 1900, 600 - random, "pipe"));
-        pipesTop.push(new component(80, 10000, "green", 1900, -9700 - random, "pipe"));
+      if (myGameArea.frameNo == 1 || everyinterval(200)) {
+        random = Math.random() * 300 - 150;
+        timeout = setTimeout(() => {
+          scoreNum = pipesBottom.length - 2;
+        }, 3100);
+        pipesBottom.push(
+          new component(80, 10000, "green", 1400, 500 - random, "pipe")
+        );
+        pipesTop.push(
+          new component(80, 10000, "green", 1400, -9800 - random, "pipe")
+        );
       }
       for (i = 0; i < pipesBottom.length; i += 1) {
         pipesBottom[i].x += -1.5;
@@ -56,6 +72,8 @@ let myGameArea = {
       }
       bird.y += this.gravitySpeed;
       bird.update();
+      score.text = `Score: ${scoreNum}`;
+      score.update();
     }, 4);
     myGameArea.canvas.addEventListener("click", clickEvent);
   },
@@ -63,6 +81,7 @@ let myGameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
   stop: function () {
+    clearTimeout(timeout);
     clearInterval(this.interval);
     myGameArea.canvas.removeEventListener("click", clickEvent);
     startGame();
@@ -117,7 +136,7 @@ function component(width, height, color, x, y, type) {
 
 const clickEvent = () => {
   myGameArea.clear();
-  myGameArea.gravitySpeed = -4;
+  myGameArea.gravitySpeed = -4.5;
   bird.update();
   for (i = 0; i < pipesBottom.length; i += 1) {
     pipesBottom[i].update();

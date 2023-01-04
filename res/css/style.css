@@ -1,3 +1,7 @@
+@font-face {
+  font-family: "TentoFont";
+  src: url("../ttf/04B_19__.TTF") format("opentype");
+}
 canvas {
-    background-color: lightblue;
+  background-image: url(../img/background.png);
 }
